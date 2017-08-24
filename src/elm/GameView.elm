@@ -42,17 +42,9 @@ viewGame model =
     Html.div
         [ style [ ( "max-width", "400px" ), ( "min-width", "280px" ), ( "flex", "1" ) ] ]
         [ Html.h1 []
-            [ Html.text (toString (round (model.time / 1000))) ]
+            [ text (toString model) ]
         , svg [ version "1.1", viewBox "0 0 400 400" ]
-            (List.concat
-                [ [ viewCell Top model
-                  , viewCell Bottom model
-                  , viewCell Left model
-                  , viewCell Right model
-                  ]
-                , (List.map viewEnemy model.enemies)
-                ]
-            )
+            []
         ]
 
 
@@ -61,13 +53,11 @@ viewStart model =
     Html.div
         [ style [ ( "max-width", "400px" ), ( "min-width", "280px" ), ( "flex", "1" ) ] ]
         [ Html.h1 [ style [ ( "font-size", "3em" ), ( "color", "#E31743" ) ] ]
-            [ Html.text "Quarter Past" ]
+            [ Html.text "Hunted" ]
         , Html.p []
-            [ Html.text "Quarter Past is a simple game of coordination, skill and not panicking." ]
+            [ Html.text "Pacman/Snake/... ish game" ]
         , Html.p []
-            [ Html.text "Use the arrow keys (or on touch screen devices touches) to select the active Quarter." ]
-        , Html.p []
-            [ Html.text "Avoid the rotating circles touching your active Quarter. Earn points for how long you last. Good luck. You will need it." ]
+            [ Html.text "Use the arrow keys to move." ]
         , Html.h2 [ Html.Events.onClick StartGame ]
             [ Html.text "Start" ]
         ]
@@ -81,68 +71,6 @@ viewOver model =
             [ Html.text "Game Over" ]
         , Html.p []
             [ Html.text "Your score this time was:" ]
-        , Html.h1 []
-            [ Html.text (toString (round model.time)) ]
-        , Html.p []
-            [ Html.text
-                (if model.time > 20000 then
-                    "Good effort."
-                 else
-                    "Be better."
-                )
-            ]
         , Html.h2 [ Html.Events.onClick StartGame ]
             [ Html.text "Restart" ]
         ]
-
-
-viewCell : Cell -> Model -> Html Msg
-viewCell cell model =
-    polygon [ fill (colourForCell cell model.cell), points (pointsForCell cell), onClick (CellSelection cell) ] []
-
-
-viewEnemy : Enemy -> Html Msg
-viewEnemy enemy =
-    let
-        x =
-            200 + enemy.radius * cos (enemy.angle)
-
-        y =
-            200 + enemy.radius * sin (enemy.angle)
-    in
-        circle [ fill "#e9e9e9", r "20", cx (toString x), cy (toString y) ] []
-
-
-colourForCell : Cell -> Cell -> String
-colourForCell cell selectedCell =
-    if cell == selectedCell then
-        "#E31743"
-    else
-        case cell of
-            Top ->
-                "#444444"
-
-            Bottom ->
-                "#4f4f4f"
-
-            Right ->
-                "#5f5f5f"
-
-            Left ->
-                "#555555"
-
-
-pointsForCell : Cell -> String
-pointsForCell cell =
-    case cell of
-        Top ->
-            "0,0 400,0 200,200"
-
-        Bottom ->
-            "0,400 400,400 200,200"
-
-        Right ->
-            "400,0 400,400 200,200"
-
-        Left ->
-            "0,0 0,400 200,200"
