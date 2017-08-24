@@ -29,6 +29,7 @@ initialModel =
     { state = Start
     , x = 2
     , y = 2
+    , enemies = [ Enemy 0 0 0.0 ]
     }
 
 

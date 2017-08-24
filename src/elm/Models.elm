@@ -7,8 +7,16 @@ type State
     | Over
 
 
+type alias Enemy =
+    { x : Int
+    , y : Int
+    , energy : Float
+    }
+
+
 type alias Model =
     { state : State
     , x : Int
     , y : Int
+    , enemies : List Enemy
     }
