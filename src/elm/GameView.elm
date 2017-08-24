@@ -44,7 +44,9 @@ viewGame model =
         [ Html.h1 []
             [ text (toString model) ]
         , svg [ version "1.1", viewBox "0 0 100 100" ]
-            viewGridBackground
+            (viewGridBackground
+                ++ [ viewPlayer model ]
+            )
         ]
 
 
@@ -61,6 +63,18 @@ viewGridBackground =
             Debug.log "grid" (grid 5 5)
     in
         List.map (\( a, b ) -> rect [ x (toString (a * size + 1)), y (toString (b * size + 1)), width (toString (size - 2)), height (toString (size - 2)) ] []) g
+
+
+viewPlayer : Model -> Html Msg
+viewPlayer model =
+    let
+        n =
+            5
+
+        size =
+            100 // n
+    in
+        rect [ x (toString (model.x * size + 1)), y (toString (model.y * size + 1)), width (toString (size - 2)), height (toString (size - 2)), fill "#d9d9d9" ] []
 
 
 viewStart : Model -> Html Msg
