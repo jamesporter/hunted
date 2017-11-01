@@ -16,6 +16,8 @@ type alias LevelSpec =
 type alias Enemy =
     { x : Int
     , y : Int
+    , targetX : Int
+    , targetY : Int
     , energy : Float
     }
 
@@ -27,3 +29,8 @@ type alias Model =
     , enemies : List Enemy
     , level : LevelSpec
     }
+
+
+
+-- type alias LocationyThing a =
+--     { a | x : Int, y : Int }

@@ -1,7 +1,7 @@
 module Updates exposing (..)
 
 import Models exposing (..)
-import Time exposing (Time, inMilliseconds)
+import Time exposing (Time, inSeconds)
 import Keyboard exposing (KeyCode)
 
 
@@ -29,8 +29,8 @@ initialModel =
     { state = Start
     , x = 2
     , y = 2
-    , enemies = [ Enemy 0 0 0.0 ]
-    , level = LevelSpec 5 5000.0
+    , enemies = [ Enemy 0 0 0 1 0.0, Enemy 4 3 2 4 0.5, Enemy 3 4 4 4 0.7 ]
+    , level = LevelSpec 5 1.0
     }
 
 
@@ -38,7 +38,7 @@ timeUpdate : Time -> Model -> Model
 timeUpdate dt model =
     let
         ms =
-            inMilliseconds dt
+            inSeconds dt
 
         updatedEnemies =
             model.enemies
@@ -54,14 +54,33 @@ updateAndMoveEnemy enemy ms model =
             enemy.energy + ms
     in
         if newEnergy > model.level.threshold then
-            (updateEnemyPosition { enemy | energy = 0 } model)
+            updateEnemyPosition enemy model
         else
             { enemy | energy = newEnergy }
 
 
 updateEnemyPosition : Enemy -> Model -> Enemy
-updateEnemyPosition enemy { x, y } =
-    { enemy | x = moveTowards enemy.x x, y = moveTowards enemy.y y }
+updateEnemyPosition enemy { x, y, enemies } =
+    let
+        desiredX =
+            moveTowards enemy.targetX x
+
+        desiredY =
+            moveTowards enemy.targetY y
+
+        occupied =
+            isOccupied ( desiredX, desiredY ) enemies
+    in
+        if occupied then
+            enemy
+        else
+            { enemy | x = enemy.targetX, y = enemy.targetY, targetX = desiredX, targetY = desiredY, energy = 0 }
+
+
+isOccupied : ( Int, Int ) -> List Enemy -> Bool
+isOccupied ( x, y ) enemies =
+    enemies
+        |> List.any (\e -> (e.targetX == x) && (e.targetY == y))
 
 
 moveTowards : Int -> Int -> Int

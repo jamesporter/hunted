@@ -6,7 +6,7 @@ import Html exposing (Html, text)
 import Html.Attributes exposing (style)
 import Html.Events
 import Svg exposing (svg, polygon, circle, rect)
-import Svg.Attributes exposing (version, viewBox, points, fill, width, height, x, y)
+import Svg.Attributes exposing (version, viewBox, points, fill, width, height, x, y, opacity)
 import Util exposing (grid)
 
 
@@ -45,9 +45,7 @@ viewGame model =
     in
         Html.div
             [ style [ ( "max-width", "400px" ), ( "min-width", "280px" ), ( "flex", "1" ) ] ]
-            [ Html.h1 []
-                [ text (toString model) ]
-            , svg [ version "1.1", viewBox "0 0 100 100" ]
+            [ svg [ version "1.1", viewBox "0 0 100 100" ]
                 (viewGridBackground size
                     ++ (viewEnemies model size)
                     ++ [ viewPlayer model size ]
@@ -84,7 +82,7 @@ viewPlayer model size =
 
 viewEnemies : Model -> Int -> List (Html Msg)
 viewEnemies model size =
-    model.enemies
+    (model.enemies
         |> List.map
             (\e ->
                 rect
@@ -96,6 +94,21 @@ viewEnemies model size =
                     ]
                     []
             )
+    )
+        ++ (model.enemies
+                |> List.map
+                    (\e ->
+                        rect
+                            [ x (toString (e.targetX * size + 1))
+                            , y (toString (e.targetY * size + 1))
+                            , width (toString (size - 2))
+                            , height (toString (size - 2))
+                            , fill "#ffffff"
+                            , opacity "0.3"
+                            ]
+                            []
+                    )
+           )
 
 
 viewStart : Model -> Html Msg
