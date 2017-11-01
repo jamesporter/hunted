@@ -1,7 +1,7 @@
 module Updates exposing (..)
 
 import Models exposing (..)
-import Time exposing (Time)
+import Time exposing (Time, inMilliseconds)
 import Keyboard exposing (KeyCode)
 
 
@@ -15,7 +15,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         TimeUpdate dt ->
-            ( model, Cmd.none )
+            ( timeUpdate dt model, Cmd.none )
 
         KeyDown keyCode ->
             ( keyDown keyCode model, Cmd.none )
@@ -30,8 +30,48 @@ initialModel =
     , x = 2
     , y = 2
     , enemies = [ Enemy 0 0 0.0 ]
-    , level = LevelSpec 5
+    , level = LevelSpec 5 5000.0
     }
+
+
+timeUpdate : Time -> Model -> Model
+timeUpdate dt model =
+    let
+        ms =
+            inMilliseconds dt
+
+        updatedEnemies =
+            model.enemies
+                |> List.map (\e -> updateAndMoveEnemy e ms model)
+    in
+        { model | enemies = updatedEnemies }
+
+
+updateAndMoveEnemy : Enemy -> Float -> Model -> Enemy
+updateAndMoveEnemy enemy ms model =
+    let
+        newEnergy =
+            enemy.energy + ms
+    in
+        if newEnergy > model.level.threshold then
+            (updateEnemyPosition { enemy | energy = 0 } model)
+        else
+            { enemy | energy = newEnergy }
+
+
+updateEnemyPosition : Enemy -> Model -> Enemy
+updateEnemyPosition enemy { x, y } =
+    { enemy | x = moveTowards enemy.x x, y = moveTowards enemy.y y }
+
+
+moveTowards : Int -> Int -> Int
+moveTowards current target =
+    if current > target then
+        current - 1
+    else if current < target then
+        current + 1
+    else
+        current
 
 
 keyDown : KeyCode -> Model -> Model

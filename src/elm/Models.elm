@@ -9,6 +9,7 @@ type State
 
 type alias LevelSpec =
     { size : Int
+    , threshold : Float
     }
 
 
