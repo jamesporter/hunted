@@ -29,8 +29,12 @@ initialModel =
     { state = Start
     , x = 2
     , y = 2
-    , enemies = [ Enemy 0 0 0 1 0.0, Enemy 4 3 2 4 0.5, Enemy 3 4 4 4 0.7 ]
-    , level = LevelSpec 5 1.0
+    , enemies =
+        [ Enemy 0 0 (Just { x = 1, y = 0 }) 0.0
+        , Enemy 4 3 (Just { x = 2, y = 4 }) 0.5
+        , Enemy 3 6 (Just { x = 4, y = 7 }) 0.7
+        ]
+    , level = LevelSpec 8 1.0
     }
 
 
@@ -53,34 +57,48 @@ updateAndMoveEnemy enemy ms model =
         newEnergy =
             enemy.energy + ms
     in
-        if newEnergy > model.level.threshold then
-            updateEnemyPosition enemy model
-        else
-            { enemy | energy = newEnergy }
+        case enemy.target of
+            Just t ->
+                if newEnergy > model.level.threshold then
+                    updateEnemyPosition enemy t model
+                else
+                    { enemy | energy = newEnergy }
+
+            Nothing ->
+                --attempt to find target
+                enemy
 
 
-updateEnemyPosition : Enemy -> Model -> Enemy
-updateEnemyPosition enemy { x, y, enemies } =
+updateEnemyPosition : Enemy -> { x : Int, y : Int } -> Model -> Enemy
+updateEnemyPosition enemy target { x, y, enemies } =
     let
         desiredX =
-            moveTowards enemy.targetX x
+            moveTowards target.x x
 
         desiredY =
-            moveTowards enemy.targetY y
+            moveTowards target.y y
 
         occupied =
             isOccupied ( desiredX, desiredY ) enemies
     in
         if occupied then
-            enemy
+            { enemy | x = target.x, y = target.y, target = Nothing, energy = 0 }
         else
-            { enemy | x = enemy.targetX, y = enemy.targetY, targetX = desiredX, targetY = desiredY, energy = 0 }
+            { enemy | x = target.x, y = target.y, target = Just { x = desiredX, y = desiredY }, energy = 0 }
 
 
 isOccupied : ( Int, Int ) -> List Enemy -> Bool
 isOccupied ( x, y ) enemies =
     enemies
-        |> List.any (\e -> (e.targetX == x) && (e.targetY == y))
+        |> List.any
+            (\e ->
+                case e.target of
+                    Just t ->
+                        (t.x == x) && (t.y == y)
+
+                    Nothing ->
+                        False
+            )
 
 
 moveTowards : Int -> Int -> Int
@@ -103,7 +121,7 @@ keyDown keyCode model =
                 model
 
         40 ->
-            if model.y < 4 then
+            if model.y < model.level.size - 1 then
                 { model | y = model.y + 1 }
             else
                 model
@@ -115,7 +133,7 @@ keyDown keyCode model =
                 model
 
         39 ->
-            if model.x < 4 then
+            if model.x < model.level.size - 1 then
                 { model | x = model.x + 1 }
             else
                 model

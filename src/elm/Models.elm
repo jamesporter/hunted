@@ -16,10 +16,13 @@ type alias LevelSpec =
 type alias Enemy =
     { x : Int
     , y : Int
-    , targetX : Int
-    , targetY : Int
+    , target : Maybe { x : Int, y : Int }
     , energy : Float
     }
+
+
+
+--type NoTarget | Target Int Int Float
 
 
 type alias Model =

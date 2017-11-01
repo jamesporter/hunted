@@ -46,16 +46,16 @@ viewGame model =
         Html.div
             [ style [ ( "max-width", "400px" ), ( "min-width", "280px" ), ( "flex", "1" ) ] ]
             [ svg [ version "1.1", viewBox "0 0 100 100" ]
-                (viewGridBackground size
+                (viewGridBackground model size
                     ++ (viewEnemies model size)
                     ++ [ viewPlayer model size ]
                 )
             ]
 
 
-viewGridBackground : Int -> List (Html Msg)
-viewGridBackground size =
-    (grid 5 5)
+viewGridBackground : Model -> Int -> List (Html Msg)
+viewGridBackground model size =
+    (grid model.level.size model.level.size)
         |> List.map
             (\( a, b ) ->
                 rect
@@ -96,11 +96,12 @@ viewEnemies model size =
             )
     )
         ++ (model.enemies
+                |> List.filterMap (\e -> e.target)
                 |> List.map
-                    (\e ->
+                    (\target ->
                         rect
-                            [ x (toString (e.targetX * size + 1))
-                            , y (toString (e.targetY * size + 1))
+                            [ x (toString (target.x * size + 1))
+                            , y (toString (target.y * size + 1))
                             , width (toString (size - 2))
                             , height (toString (size - 2))
                             , fill "#ffffff"
