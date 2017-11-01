@@ -7,6 +7,11 @@ type State
     | Over
 
 
+type alias LevelSpec =
+    { size : Int
+    }
+
+
 type alias Enemy =
     { x : Int
     , y : Int
@@ -19,4 +24,5 @@ type alias Model =
     , x : Int
     , y : Int
     , enemies : List Enemy
+    , level : LevelSpec
     }

@@ -39,42 +39,63 @@ view model =
 
 viewGame : Model -> Html Msg
 viewGame model =
-    Html.div
-        [ style [ ( "max-width", "400px" ), ( "min-width", "280px" ), ( "flex", "1" ) ] ]
-        [ Html.h1 []
-            [ text (toString model) ]
-        , svg [ version "1.1", viewBox "0 0 100 100" ]
-            (viewGridBackground
-                ++ [ viewPlayer model ]
+    let
+        size =
+            100 // model.level.size
+    in
+        Html.div
+            [ style [ ( "max-width", "400px" ), ( "min-width", "280px" ), ( "flex", "1" ) ] ]
+            [ Html.h1 []
+                [ text (toString model) ]
+            , svg [ version "1.1", viewBox "0 0 100 100" ]
+                (viewGridBackground size
+                    ++ (viewEnemies model size)
+                    ++ [ viewPlayer model size ]
+                )
+            ]
+
+
+viewGridBackground : Int -> List (Html Msg)
+viewGridBackground size =
+    (grid 5 5)
+        |> List.map
+            (\( a, b ) ->
+                rect
+                    [ x (toString (a * size + 1))
+                    , y (toString (b * size + 1))
+                    , width (toString (size - 2))
+                    , height (toString (size - 2))
+                    ]
+                    []
             )
+
+
+viewPlayer : Model -> Int -> Html Msg
+viewPlayer model size =
+    rect
+        [ x (toString (model.x * size + 1))
+        , y (toString (model.y * size + 1))
+        , width (toString (size - 2))
+        , height (toString (size - 2))
+        , fill "#d9d9d9"
         ]
+        []
 
 
-viewGridBackground : List (Html Msg)
-viewGridBackground =
-    let
-        n =
-            5
-
-        size =
-            100 // n
-
-        g =
-            Debug.log "grid" (grid 5 5)
-    in
-        List.map (\( a, b ) -> rect [ x (toString (a * size + 1)), y (toString (b * size + 1)), width (toString (size - 2)), height (toString (size - 2)) ] []) g
-
-
-viewPlayer : Model -> Html Msg
-viewPlayer model =
-    let
-        n =
-            5
-
-        size =
-            100 // n
-    in
-        rect [ x (toString (model.x * size + 1)), y (toString (model.y * size + 1)), width (toString (size - 2)), height (toString (size - 2)), fill "#d9d9d9" ] []
+viewEnemies : Model -> Int -> List (Html Msg)
+viewEnemies model size =
+    model.enemies
+        |> List.map
+            (\e ->
+                rect
+                    [ x (toString (e.x * size + 1))
+                    , y (toString (e.y * size + 1))
+                    , width (toString (size - 2))
+                    , height (toString (size - 2))
+                    , fill "#ff6666"
+                    ]
+                    []
+            )
 
 
 viewStart : Model -> Html Msg

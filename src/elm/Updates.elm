@@ -30,6 +30,7 @@ initialModel =
     , x = 2
     , y = 2
     , enemies = [ Enemy 0 0 0.0 ]
+    , level = LevelSpec 5
     }
 
 
