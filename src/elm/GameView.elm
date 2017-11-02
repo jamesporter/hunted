@@ -6,7 +6,21 @@ import Html exposing (Html, text)
 import Html.Attributes exposing (style)
 import Html.Events
 import Svg exposing (svg, polygon, circle, rect)
-import Svg.Attributes exposing (version, viewBox, points, fill, width, height, x, y, opacity)
+import Svg.Attributes
+    exposing
+        ( version
+        , viewBox
+        , points
+        , fill
+        , width
+        , height
+        , x
+        , y
+        , opacity
+        , cx
+        , cy
+        , r
+        )
 import Util exposing (grid)
 
 
@@ -99,11 +113,10 @@ viewEnemies model size =
                 |> List.filterMap (\e -> e.target)
                 |> List.map
                     (\target ->
-                        rect
-                            [ x (toString (target.x * size + 1))
-                            , y (toString (target.y * size + 1))
-                            , width (toString (size - 2))
-                            , height (toString (size - 2))
+                        circle
+                            [ cx (toString (target.x * size + size // 2))
+                            , cy (toString (target.y * size + size // 2))
+                            , r (toString ((toFloat size) * 0.7))
                             , fill "#ffffff"
                             , opacity "0.3"
                             ]
