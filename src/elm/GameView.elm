@@ -97,28 +97,28 @@ viewPlayer model size =
 viewEnemies : Model -> Int -> List (Html Msg)
 viewEnemies model size =
     (model.enemies
+        |> List.filterMap (\e -> e.target)
         |> List.map
-            (\e ->
-                rect
-                    [ x (toString (e.x * size + 1))
-                    , y (toString (e.y * size + 1))
-                    , width (toString (size - 2))
-                    , height (toString (size - 2))
-                    , fill "#ff6666"
+            (\target ->
+                circle
+                    [ cx (toString (target.x * size + size // 2))
+                    , cy (toString (target.y * size + size // 2))
+                    , r (toString ((toFloat size) * 0.7))
+                    , fill "#ffffff"
+                    , opacity "0.1"
                     ]
                     []
             )
     )
         ++ (model.enemies
-                |> List.filterMap (\e -> e.target)
                 |> List.map
-                    (\target ->
-                        circle
-                            [ cx (toString (target.x * size + size // 2))
-                            , cy (toString (target.y * size + size // 2))
-                            , r (toString ((toFloat size) * 0.7))
-                            , fill "#ffffff"
-                            , opacity "0.3"
+                    (\e ->
+                        rect
+                            [ x (toString (e.x * size + 1))
+                            , y (toString (e.y * size + 1))
+                            , width (toString (size - 2))
+                            , height (toString (size - 2))
+                            , fill "#ff6666"
                             ]
                             []
                     )
