@@ -47,8 +47,32 @@ timeUpdate dt model =
         updatedEnemies =
             model.enemies
                 |> List.map (\e -> updateAndMoveEnemy e ms model)
+                |> List.map (\e -> findTargetIfNone e model)
     in
         { model | enemies = updatedEnemies }
+
+
+findTargetIfNone : Enemy -> Model -> Enemy
+findTargetIfNone enemy model =
+    case enemy.target of
+        Just t ->
+            enemy
+
+        Nothing ->
+            let
+                desiredX =
+                    moveTowards enemy.x model.x
+
+                desiredY =
+                    moveTowards enemy.y model.y
+
+                occupied =
+                    isOccupied ( desiredX, desiredY ) model.enemies
+            in
+                if occupied then
+                    enemy
+                else
+                    { enemy | target = Just { x = desiredX, y = desiredY }, energy = 0 }
 
 
 updateAndMoveEnemy : Enemy -> Float -> Model -> Enemy
@@ -89,16 +113,23 @@ updateEnemyPosition enemy target { x, y, enemies } =
 
 isOccupied : ( Int, Int ) -> List Enemy -> Bool
 isOccupied ( x, y ) enemies =
-    enemies
-        |> List.any
-            (\e ->
-                case e.target of
-                    Just t ->
-                        (t.x == x) && (t.y == y)
+    (List.any
+        (\e ->
+            case e.target of
+                Just t ->
+                    (t.x == x) && (t.y == y)
 
-                    Nothing ->
-                        False
-            )
+                Nothing ->
+                    False
+        )
+        enemies
+    )
+        || (List.any (\e -> (e.x == x) && (e.y == y)) enemies)
+
+
+
+-- matchSquare : (Int, Int) -> Enemy -> Bool
+-- matchSquare (x,y) enemy =
 
 
 moveTowards : Int -> Int -> Int
